@@ -31,7 +31,7 @@ const PREFIX_PATTERN_ENV = "env"
 const PREFIX_PATTERN_FILE = "file"
 const PREFIX_PATTERN_USER = "user-provided"
 
-var loadedMappings = make (map [string]string) 
+var loadedMappings = make (map [string]interface{}) 
 
 func check(e error) {
     if e != nil {
@@ -103,13 +103,11 @@ func processMappingV2(mappingName string, config gjson.Result){
 			value, ok := processSearchPattern(fmt.Sprintf("$%s[%s]", mappingName, key.String()), searchPattern.String())
 			if ok {
 				_, exists := loadedMappings[mappingName]
-				jsonAddition := "\""+key.String()+"\" : \"" + value + "\""
 				if !exists {
-					loadedMappings[mappingName] = "{"+jsonAddition+"}"
-				}else{
-					jsonStr := loadedMappings[mappingName]
-					loadedMappings[mappingName] = jsonStr[:len(jsonStr)-1]+", "+jsonAddition+"}"
+					loadedMappings[mappingName] = make(map[string]string)
 				}
+
+				loadedMappings[mappingName].(map[string]string)[key.String()] = value
 				return false
 			} else {
 				return true
@@ -300,7 +298,12 @@ func GetCredentialsForService(serviceTag, serviceLabel string, credentials gjson
 
 func GetString(name string) (string, bool) {
 	val, ok := loadedMappings[name]
-	return val, ok
+	_, isStr := val.(string)
+	if ok && !isStr {
+		bytes, _ := json.Marshal(val)
+		return string(bytes), true
+	}
+	return val.(string), ok
 }
 
 func GetDictionary(name string) gjson.Result {
