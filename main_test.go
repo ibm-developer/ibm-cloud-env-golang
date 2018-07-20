@@ -60,7 +60,7 @@ func setEnvVariable() {
 	os.Setenv("ENV_VAR_JSON", credentials)
 
 	Initialize("/invalid-file-name")
-	Initialize("mappings.json")
+	Initialize("server/config/mappings.json")
 }
 
 
@@ -68,7 +68,7 @@ func TestPlainTextFile(t *testing.T) {
 	setEnvVariable()
 	testString, _ := GetString("file_var1")
 	if testString != "plain-text-string" {
-		t.Errorf("testSTring is: " +  testString)
+		t.Errorf("testString is: " +  testString)
 		t.Errorf("can't read " + testString + " from GetString()")
 	} 
 	result := GetDictionary("file_var1").Get("value")

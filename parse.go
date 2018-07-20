@@ -29,6 +29,7 @@ import ("os"
 const PREFIX_PATTERN_CF = "cloudfoundry"
 const PREFIX_PATTERN_ENV = "env"
 const PREFIX_PATTERN_FILE = "file"
+const PREFIX_PATTERN_USER = "user-provided"
 
 var loadedMappings = make (map [string]string) 
 
@@ -56,8 +57,15 @@ func Initialize(mappingsFilePath string) string {
 	}
   mappingsFilePath =  dir + mappingsFilePath;
   result := gjson.Parse(string(json))
+  version := result.Get("version").Int()
   result.ForEach(func (key, value gjson.Result) bool{
-  	processMapping(key.String(),value) 
+  	if !result.Get("version").Exists() {
+	  	processMapping(key.String(),value) 
+	  } else if version == 1 {
+	  	processMapping(key.String(),value) 
+	  } else if version == 2{
+	  	processMappingV2(key.String(),value) 
+	  }
   	return true 
   })
 	return mappingsFilePath
@@ -79,8 +87,36 @@ func processMapping(mappingName string, config gjson.Result) bool {
 		}
 
 	})
-	//never will be hit 
+
 	return true
+}
+
+func processMappingV2(mappingName string, config gjson.Result){
+	config.ForEach(func (key, value gjson.Result) bool {
+		searchPatterns := value.Get("searchPatterns")
+		if !searchPatterns.Exists() || len(searchPatterns.Array()) == 0{
+			log.Warningln("No credentials found uusing searchPatterns under ", mappingName)
+		}
+
+		searchPatterns.ForEach(func(_, searchPattern gjson.Result) bool{
+			value, ok := processSearchPattern(fmt.Sprintf("$%s[%s]", mappingName, key.String()), searchPattern.String())
+			if ok {
+				_, exists := loadedMappings[mappingName]
+				jsonAddition := "\""+key.String()+"\" : \"" + value + "\""
+				if !exists {
+					loadedMappings[mappingName] = "{"+jsonAddition+"}"
+				}else{
+					jsonStr := loadedMappings[mappingName]
+					loadedMappings[mappingName] = jsonStr[:len(jsonStr)-1]+", "+jsonAddition+"}"
+				}
+				return false
+			} else {
+				return true
+			}
+		})
+
+		return true
+	})
 }
 
 func processSearchPattern(mappingName string, searchPattern string) (string, bool) {
@@ -96,6 +132,9 @@ func processSearchPattern(mappingName string, searchPattern string) (string, boo
 		break
 	case PREFIX_PATTERN_ENV:
 		value, OK  = processEnvSearchPattern(patternComponents)
+		break
+	case PREFIX_PATTERN_USER:
+		value, OK  = processUserProvidedSearchPattern(patternComponents)
 		break
 	default:
 		log.Warnln("Unknown searchPattern prefix", patternComponents[0], "Supported prefixes: cloudfoundry, env, file")
@@ -158,6 +197,47 @@ func processEnvSearchPattern(patternComponents [] string) (string, bool) {
 	return value, OK
 }
 
+func processUserProvidedSearchPattern(patternComponents []string) (string, bool){
+	vcapServicesString, ok := os.LookupEnv("VCAP_SERVICES")
+	if !ok {
+		return "", false
+	}
+	if(len(patternComponents) == 3){
+		serviceName := patternComponents[1]
+		return processJSONCredentials(vcapServicesString, serviceName, patternComponents[2])
+	}
+	return "", false
+}
+
+func processJSONCredentials(jsonString, servicename, credkey string) (string, bool){
+	if !gjson.Valid(jsonString) {
+		log.Errorln("Failed to apply JSONPath", jsonString)
+		return "", false
+	}
+	jsonObj := gjson.Parse(jsonString)
+	credArray := jsonObj.Get(PREFIX_PATTERN_USER)
+	ret, ok := "", false
+	credArray.ForEach (func (_, searchPattern gjson.Result) bool {
+		if searchPattern.Get("name").String() == servicename {
+			path := "$.." + credkey
+			res, err := jsonpath.JsonPathLookup(searchPattern.String(), path)
+			_, isMap := res.(map[string]interface{})
+			_, isArr := res.([]interface{})
+			
+			if isMap || isArr {
+				bytes, _ := json.Marshal(res)
+				res = string(bytes)
+				ok = true
+			} else {
+				ret, ok = fmt.Sprintf("%v", res), err == nil
+			}
+			return false
+		}
+		return true
+	})
+	return ret, ok
+}
+
 func processJSONPath(jsonString string, jsonPath string) (string,bool) {
 	var json_data interface{}
 	json.Unmarshal([]byte(jsonString), &json_data)
@@ -170,6 +250,25 @@ func processJSONPath(jsonString string, jsonPath string) (string,bool) {
 		return string(test), err == nil
 	}
 	return fmt.Sprintf("%v", res), err == nil
+}
+
+func GetCredentialsForService(serviceTag, serviceLabel string, credentials gjson.Result) map[string]string{
+	creds := make(map[string]string)
+	key := serviceTag + "_" + serviceLabel + "_"
+	if credentials.Exists() {
+		credentials.ForEach(func (k, v gjson.Result) bool {
+			if strings.Index(k.String(), key) == 0 {
+				credKey := k.String()[:len(key)]
+				if(credKey == "apikey" && serviceTag == "watson"){
+					creds["iam_"+credKey] = v.String()
+				}else{
+					creds[credKey] = v.String()
+				}
+			}
+			return true
+		})
+	}
+	return creds
 }
 
 func GetString(name string) (string, bool) {
