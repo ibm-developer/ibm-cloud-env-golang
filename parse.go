@@ -183,8 +183,24 @@ func processCFSearchPattern(patternComponents [] string) (string, bool) {
 			}
 		} else {
 			// patternComponents[1] is a service instance name, find it in VCAP_SERVICES and return credentials object
-			jsonPath := "$..[?(@.name==\"" + patternComponents[1] + "\")].credentials"
-			return processJSONPath(vcapServicesString, jsonPath)
+			json := gjson.Parse(vcapServicesString)
+			res, ok := "", false
+			json.ForEach(func (k, v gjson.Result) bool {
+				v.ForEach(func (_, item gjson.Result) bool {
+					if item.Get("name").String() == patternComponents[1]{
+						res, ok = item.Get("credentials").String(), true
+						return false
+					}else{
+						return true
+					}
+				})
+				if ok{
+					return false
+				}else{
+					return true
+				}
+			})
+			return res, ok
 		
 		}
 	}
@@ -220,29 +236,39 @@ func processJSONCredentials(jsonString, servicename, credkey string) (string, bo
 	ret, ok := "", false
 	credArray.ForEach (func (_, searchPattern gjson.Result) bool {
 		if searchPattern.Get("name").String() == servicename {
-			path := "$.." + credkey
-			res, err := jsonpath.JsonPathLookup(searchPattern.String(), path)
-			_, isMap := res.(map[string]interface{})
-			_, isArr := res.([]interface{})
-			
-			if isMap || isArr {
-				bytes, _ := json.Marshal(res)
-				res = string(bytes)
-				ok = true
-			} else {
-				ret, ok = fmt.Sprintf("%v", res), err == nil
-			}
-			return false
+			ret, ok = deepSearch(searchPattern, credkey)
+			return !ok
 		}
 		return true
 	})
 	return ret, ok
 }
 
+func deepSearch(current gjson.Result, search string) (string, bool){
+
+
+	res := current.Get(search).String()
+	ok := false
+	if current.Get(search).Exists() {
+		return res, true
+	}
+
+	_, isMap := current.Value().(map[string]interface{})
+	_, isArr := current.Value().([]interface{})
+	if isMap || isArr {
+		current.ForEach(func (_, v gjson.Result) bool {
+			res, ok = deepSearch(v, search)
+			return !ok
+		})
+	}
+	return res, ok
+}
+
 func processJSONPath(jsonString string, jsonPath string) (string,bool) {
 	var json_data interface{}
 	json.Unmarshal([]byte(jsonString), &json_data)
 	res, err := jsonpath.JsonPathLookup(json_data, jsonPath)
+	// fmt.Println("HERE: ", jsonPath, jsonString, res, err)
 	_, isMap := res.(map[string]interface{})
 	_, isArr := res.([]interface{})
 	
