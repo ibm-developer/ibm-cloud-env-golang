@@ -94,6 +94,7 @@ func processMapping(mappingName string, config gjson.Result) bool {
 func processMappingV2(mappingName string, config gjson.Result){
 	config.ForEach(func (key, value gjson.Result) bool {
 		searchPatterns := value.Get("searchPatterns")
+		fmt.Println("search Patterns: " + searchPatterns.String())
 		if !searchPatterns.Exists() || len(searchPatterns.Array()) == 0{
 			log.Warningln("No credentials found uusing searchPatterns under ", mappingName)
 		}
