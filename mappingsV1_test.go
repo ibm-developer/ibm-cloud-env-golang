@@ -18,6 +18,7 @@ package IBMCloudEnv
 import (
 	"testing" 
 	"os"
+	"fmt"
 	"github.com/tidwall/gjson"
 )
 
@@ -92,6 +93,10 @@ func TestPlainTextFileV1(t *testing.T) {
 		t.Errorf("testString is: " +  testString)
 		t.Errorf("can't read " + testString + " from GetString()")
 	} 
+
+	fmt.Println("IN V1 result var1 is: ")
+	fmt.Println(GetDictionary("file_var1"))
+
 	result := GetDictionary("file_var1").Get("value")
 	if result.String() != "plain-text-string" {
 		 t.Errorf("can't read " + result.String() + " text from GetDictionary()")
