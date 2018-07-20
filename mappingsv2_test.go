@@ -18,8 +18,9 @@ package IBMCloudEnv
 import (
 	"testing" 
 	"os"
-	"fmt"
-)
+	//"fmt"
+	"github.com/tidwall/gjson"
+	)
 
 const jsonObjectV2 = 
 `{
@@ -66,22 +67,16 @@ func setEnvVariableV2() {
 
 func TestPlainTextFileV2(t *testing.T) {
 	setEnvVariableV2()
-	result := GetDictionary("var1")
-	fmt.Println("result var1 is: ")
-	fmt.Println(result)
-
-	result2:= result.Get("value")
-	fmt.Println("result2 is: ")
-	fmt.Println(result2)
-
-	if result2.String() != "plain-text-string" {
-		 t.Errorf("can't read " + result2.String() + " text from GetDictionary()")
+	result := GetDictionary("var1").Get("file_var1")
+	if result.String() != "plain-text-string" {
+		 t.Errorf("can't read " + result.String() + " text from GetDictionary()")
 	} 
 }
 
 func TestJsonFileAndPathV2(t *testing.T){
 	setEnvVariableV2()
-	testString := GetDictionary("var2").Get("level2").String()
+	pre_json := GetDictionary("var2" ).Get("file_var2").String()
+	testString := gjson.Parse(pre_json).Get("level2").String()
 	if testString != "12345" {
 		t.Errorf("Got: \t%s\n Wanted: \t%s\n", testString, "12345")
 	}
@@ -89,7 +84,8 @@ func TestJsonFileAndPathV2(t *testing.T){
 
 func TestCFServiceCredentialsWithServiceInstanceV2 (t *testing.T){
 	setEnvVariableV2()
-	testString := GetDictionary("var1").Get("username").String()
+	pre_json := GetDictionary("var1").Get("cf_var1").String()
+	testString := gjson.Parse(pre_json).Get("username").String()
 	if testString != "service1-username1" {
 		t.Errorf("Got: \t%s\n Wanted: \t%s\n", testString, "service1-username1")
 	}
@@ -98,14 +94,14 @@ func TestCFServiceCredentialsWithServiceInstanceV2 (t *testing.T){
 func TestReadVcapsWithJsonPathV2(t *testing.T){
 	setEnvVariableV2()
 
-	result := GetDictionary("var2").Get("value")
-	if result.String() != "service1-username1" {
-		 t.Errorf("can't read " + result.String() + " text from GetDictionary()")
+	result1 := GetDictionary("var2").Get("cf_var2").String()
+	if result1 != "service1-username1" {
+		 t.Errorf("can't read " + result1 + " text from GetDictionary()")
 	} 
 
-	result2 := GetDictionary("var3").Get("value")
-	if result2.String() != "test-application" {
-		 t.Errorf("can't read " + result2.String() + " text from GetDictionary()")
+	result2 := GetDictionary("var3").Get("cf_var3").String()
+	if result2 != "test-application" {
+		 t.Errorf("can't read " + result2 + " text from GetDictionary()")
 	} 
 
 	//removed this test because there wasn't a cf_var4 in mappings.json
@@ -121,7 +117,7 @@ func TestReadVcapsWithJsonPathV2(t *testing.T){
 
 func TestSimpleStringFromEnvVarV2(t *testing.T){
 	setEnvVariableV2()
-	result := GetDictionary("var1").Get("value")
+	result := GetDictionary("env_var1").Get("value")
 	if result.String() != "test-12345" {
 		 t.Errorf("can't read " + result.String() + " text from GetDictionary()")
 	} 
@@ -130,7 +126,7 @@ func TestSimpleStringFromEnvVarV2(t *testing.T){
 func TestJsonFromEnvVarV2(t *testing.T){
 	setEnvVariableV2()
 
-	testString := GetDictionary("var2").Get("credentials").Get("username").String()
+	testString := GetDictionary("env_var2").Get("credentials").Get("username").String()
 	if testString != "env-var-json-username" {
 		t.Errorf("Got: \t%s\n Wanted: \t%s\n", testString, "env-var-json-username")
 	}
@@ -139,7 +135,7 @@ func TestJsonFromEnvVarV2(t *testing.T){
 func TestJsonPathFromEnvVarV2(t *testing.T){
 	setEnvVariableV2()
 
-	testString := GetDictionary("var3").Get("value").String()
+	testString := GetDictionary("env_var3").Get("value").String()
 	if testString != "env-var-json-username" {
 		t.Errorf("Got: \t%s\n Wanted: \t%s\n", testString, "env-var-json-username")
 	}
