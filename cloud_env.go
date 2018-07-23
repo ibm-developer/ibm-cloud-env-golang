@@ -277,13 +277,14 @@ func processJSONPath(jsonString string, jsonPath string) (string,bool) {
 	return fmt.Sprintf("%v", res), err == nil
 }
 
-func GetCredentialsForService(serviceTag, serviceLabel string, credentials gjson.Result) map[string]string{
+func GetCredentialsForService(serviceTag, serviceLabel, credentials string) map[string]string{
+	creds_json := gjson.Parse(credentials)
 	creds := make(map[string]string)
 	key := serviceTag + "_" + serviceLabel + "_"
-	if credentials.Exists() {
-		credentials.ForEach(func (k, v gjson.Result) bool {
+	if creds_json.Exists() {
+		creds_json.ForEach(func (k, v gjson.Result) bool {
 			if strings.Index(k.String(), key) == 0 {
-				credKey := k.String()[:len(key)]
+				credKey := k.String()[len(key):]
 				if(credKey == "apikey" && serviceTag == "watson"){
 					creds["iam_"+credKey] = v.String()
 				}else{
