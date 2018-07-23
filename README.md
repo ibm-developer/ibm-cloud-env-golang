@@ -34,6 +34,7 @@ ibm-cloud-config supports searching for values using three search pattern types 
 - env:env-var-name:$.JSONPath - attempts to parse the environment variable "env-var-name" and return a value that corresponds to JSONPath
 - file:/server/config.text - returns content of /server/config.text file
 - file:/server/config.json:$.JSONPath - reads the content of /server/config.json file, tries to parse it, returns the value that corresponds to JSONPath
+- user-provided:service:information - attempts to find and return the information (ex. credentials of API key, service name) of the requested variable that the user requests 
 
 #### mappings.json file example
 ```javascript
@@ -50,6 +51,17 @@ ibm-cloud-config supports searching for values using three search pattern types 
             "cloudfoundry:$.service2[@.name=='my-service2-instance-name'].credentials.username",
             "env:my-service2-credentials:$.username",
             "file:/localdev/my-service1-credentials.json:$.username" 
+        ]
+    }
+}
+```
+
+#### user-provided search pattern example
+```javascript
+{
+    "user_provided_var1":{
+        "searchPatterns": [
+            "user-provided:servicename1:apikey"
         ]
     }
 }
