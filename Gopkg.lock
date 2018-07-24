@@ -10,8 +10,8 @@
 [[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
-  revision = "c155da19408a8799da419ed3eeb0cb5db0ad5dbc"
-  version = "v1.0.5"
+  revision = "3e01752db0189b9157070a0e1668a620f9a85da2"
+  version = "v1.0.6"
 
 [[projects]]
   name = "github.com/tidwall/gjson"
@@ -29,7 +29,7 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
-  revision = "a49355c7e3f8fe157a85be2f77e6e269a0f89602"
+  revision = "c126467f60eb25f8f27e5a981f32a87e3965053f"
 
 [[projects]]
   branch = "master"
@@ -38,11 +38,11 @@
     "unix",
     "windows"
   ]
-  revision = "ce36f3865eeb42541ce3f87f32f8462c5687befa"
+  revision = "ac767d655b305d4e9612f5f6e33120b9176c4ad4"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "98b12a44978be1462a66311143e86126b6d55588d4b2c7fc0582d2f80a99894b"
+  inputs-digest = "41f36e8b9555227845c3ccc6cabebac258114d897d7e71c38283f31ed4269e1e"
   solver-name = "gps-cdcl"
   solver-version = 1

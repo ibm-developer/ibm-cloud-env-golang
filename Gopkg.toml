@@ -26,6 +26,14 @@
 
 
 [[constraint]]
+  branch = "master"
+  name = "github.com/oliveagle/jsonpath"
+
+[[constraint]]
+  name = "github.com/sirupsen/logrus"
+  version = "1.0.6"
+
+[[constraint]]
   name = "github.com/tidwall/gjson"
   version = "1.1.2"
 
