@@ -118,11 +118,7 @@ func TestJsonFileAndPathV1(t *testing.T){
 
 func TestCFServiceCredentialsWithInstanceNameV1 (t *testing.T){
 	setEnvVariableV1()
-	// testString, _ := GetString("cf_var1")
-	// if testString != "{\n\t\"username\": \"service1-username1\"\n}" {
-	// 	t.Errorf("Got: \t%s\n Wanted: \t%s\n", testString, "{\n\t\"username\": \"service1-username1\"\n}")
-	// }
-
+	
 	testString := GetDictionary("cf_var1").Get("username").String()
 	if testString != "service1-username1" {
 		t.Errorf("Got: \t%s\n Wanted: \t%s\n", testString, "{\"username\":\"service1-username1\"}")
@@ -173,16 +169,6 @@ func TestReadVcapsWithJsonPathV1(t *testing.T){
 	if result2.String() != "test-application" {
 		 t.Errorf("can't read " + result2.String() + " text from GetDictionary()")
 	} 
-
-	//removed this test because there wasn't a cf_var4 in mappings.json
-	/*testString3, _ := GetString("cf_var4")
-	if testString3 != "service1-username1" {
-		t.Errorf("can't read " + testString3 + " from GetString()")
-	}
-	result3 := GetDictionary("cf_var4").Get("value")
-	if result3.String() != "service1-username1" {
-		 t.Errorf("can't read " + result3.String() + " text from GetDictionary()")
-	}*/
 }
 
 func TestSimpleStringFromEnvVarV1(t *testing.T){
