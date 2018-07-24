@@ -22,10 +22,11 @@ IBMCloudEnv.Initialize("/path/to/the/mappings/file/relative/to/prject/root")
 ```
  
 #### Supported search patterns types
-ibm-cloud-config supports searching for values using three search pattern types - cloudfoundry, env, file. 
+ibm-cloud-config supports searching for values using four search pattern types - cloudfoundry, env, file, user-provided. 
 - Using `cloudfoundry` allows to search for values in VCAP_SERVICES and VCAP_APPLICATIONS environment variables
 - Using `env` allows to search for values in environment variables
 - Using `file` allows to search for values in text/json files
+- Using `user-provided` allows to search for values in VCAP_SERVICES for service credentials
 
 #### Example search patterns
 - cloudfoundry:service-instance-name - searches through parsed VCAP_SERVICES environment variable and returns the `credentials` object of the matching service instance name
