@@ -1,8 +1,8 @@
 # IBM Cloud Environment
 
-The `ibm-cloud-env-golang` module allows to abstract environment variables from various Cloud compute providers, such as, but not limited to, CloudFoundry and Kubernetes, so the application could be environment-agnostic.
+The `ibm-cloud-env-golang` package allows to abstract environment variables from various Cloud compute providers, such as, but not limited to, CloudFoundry and Kubernetes, so the application could be environment-agnostic.
 
-The module allows to define an array of search patterns that will be executed one by one until required value is found.
+The package allows to define an array of search patterns that will be executed one by one until required value is found.
 
 ### Installation
 
@@ -22,26 +22,27 @@ IBMCloudEnv.Initialize("/path/to/the/mappings/file/relative/to/prject/root")
 ```
  
 #### Supported search patterns types
-ibm-cloud-config supports searching for values using four search pattern types - cloudfoundry, env, file, user-provided. 
+ibm-cloud-config supports searching for values using four search pattern types - user-provided, cloudfoundry, env, file.
+- Using `user-provided` allows to search for values in VCAP_SERVICES for service credentials
 - Using `cloudfoundry` allows to search for values in VCAP_SERVICES and VCAP_APPLICATIONS environment variables
 - Using `env` allows to search for values in environment variables
 - Using `file` allows to search for values in text/json files
-- Using `user-provided` allows to search for values in VCAP_SERVICES for service credentials
 
 #### Example search patterns
+- user-provided:service:name - searches through parsed VCAP_SERVICES environment variable and returns the value of the requested service name and credential
 - cloudfoundry:service-instance-name - searches through parsed VCAP_SERVICES environment variable and returns the `credentials` object of the matching service instance name
 - cloudfoundry:$.JSONPath - searches through parsed VCAP_SERVICES and VCAP_APPLICATION environment variables and returns the value that corresponds to JSONPath
 - env:env-var-name - returns environment variable named "env-var-name"
 - env:env-var-name:$.JSONPath - attempts to parse the environment variable "env-var-name" and return a value that corresponds to JSONPath
 - file:/server/config.text - returns content of /server/config.text file
 - file:/server/config.json:$.JSONPath - reads the content of /server/config.json file, tries to parse it, returns the value that corresponds to JSONPath
-- user-provided:service:name - searches through parsed VCAP_SERVICES environment variable and returns the value of the requested service name and credential
 
 #### mappings.json file example
 ```javascript
 {
     "service1-credentials": {
         "searchPatterns": [
+            "user-provided:my-service1-instance-name:service1-credentials",
             "cloudfoundry:my-service1-instance-name", 
             "env:my-service1-credentials", 
             "file:/localdev/my-service1-credentials.json" 
@@ -49,11 +50,10 @@ ibm-cloud-config supports searching for values using four search pattern types -
     },
     "service2-username": {
         "searchPatterns":[
+            "user-provided:my-service2-instance-name:username",
             "cloudfoundry:$.service2[@.name=='my-service2-instance-name'].credentials.username",
             "env:my-service2-credentials:$.username",
-            "file:/localdev/my-service1-credentials.json:$.username",
-            "user-provided:my-service2-instance-name:username"
-
+            "file:/localdev/my-service1-credentials.json:$.username"
         ]
     }
 }
