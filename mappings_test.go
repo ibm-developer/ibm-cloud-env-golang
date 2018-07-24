@@ -111,16 +111,6 @@ func TestReadVcapsWithJsonPath(t *testing.T){
 	if result2.String() != "test-application" {
 		 t.Errorf("can't read " + result2.String() + " text from GetDictionary()")
 	} 
-
-	//removed this test because there wasn't a cf_var4 in mappings.json
-	/*testString3, _ := GetString("cf_var4")
-	if testString3 != "service1-username1" {
-		t.Errorf("can't read " + testString3 + " from GetString()")
-	}
-	result3 := GetDictionary("cf_var4").Get("value")
-	if result3.String() != "service1-username1" {
-		 t.Errorf("can't read " + result3.String() + " text from GetDictionary()")
-	}*/
 }
 
 func TestSimpleStringFromEnvVar(t *testing.T){
