@@ -18,7 +18,6 @@ package IBMCloudEnv
 import (
 	"testing" 
 	"os"
-	//"fmt"
 	"github.com/tidwall/gjson"
 	)
 
@@ -82,7 +81,7 @@ func TestJsonFileAndPathV2(t *testing.T){
 	}
 }
 
-func TestCFServiceCredentialsWithServiceInstanceV2 (t *testing.T){
+func TestCFServiceCredentialsWithServiceInstanceV2(t *testing.T){
 	setEnvVariableV2()
 	pre_json := GetDictionary("var1").Get("cf_var1").String()
 	testString := gjson.Parse(pre_json).Get("username").String()
@@ -103,16 +102,6 @@ func TestReadVcapsWithJsonPathV2(t *testing.T){
 	if result2 != "test-application" {
 		 t.Errorf("can't read " + result2 + " text from GetDictionary()")
 	} 
-
-	//removed this test because there wasn't a cf_var4 in mappings.json
-	/*testString3, _ := GetString("cf_var4")
-	if testString3 != "service1-username1" {
-		t.Errorf("can't read " + testString3 + " from GetString()")
-	}
-	result3 := GetDictionary("cf_var4").Get("value")
-	if result3.String() != "service1-username1" {
-		 t.Errorf("can't read " + result3.String() + " text from GetDictionary()")
-	}*/
 }
 
 func TestSimpleStringFromEnvVarV2(t *testing.T){
