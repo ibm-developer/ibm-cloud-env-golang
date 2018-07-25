@@ -1,6 +1,7 @@
 package IBMCloudEnv
+
 import (
-  "testing"
+	"testing"
 )
 
 const service_credentials = `{
@@ -14,31 +15,31 @@ const service_credentials = `{
 }`
 
 var filtered_credentials map[string]string = map[string]string{
-  "api_key":"api_key", 
-  "iam_apikey": "apikey",
-  "password": "password",
-  "url": "url",
-  "username": "username",
+	"api_key":    "api_key",
+	"iam_apikey": "apikey",
+	"password":   "password",
+	"url":        "url",
+	"username":   "username",
 }
 
 func TestMissingParams(t *testing.T) {
-  if len(GetCredentialsForService("", "", "")) != 0 {
-    t.Errorf("Credentials not empty\n")
-  }
-  if len(GetCredentialsForService("", "", "{}")) != 0 {
-    t.Errorf("Credentials not empty\n")
-  }
+	if len(GetCredentialsForService("", "", "")) != 0 {
+		t.Errorf("Credentials not empty\n")
+	}
+	if len(GetCredentialsForService("", "", "{}")) != 0 {
+		t.Errorf("Credentials not empty\n")
+	}
 }
 
 func TestCredentials(t *testing.T) {
-  returned_creds := GetCredentialsForService("watson", "conversation", service_credentials)
-  if len(returned_creds) != len(filtered_credentials) {
-    t.Errorf("Credentials have different sizes: %d, %d\n", len(returned_creds), len(filtered_credentials))
-  }
+	returned_creds := GetCredentialsForService("watson", "conversation", service_credentials)
+	if len(returned_creds) != len(filtered_credentials) {
+		t.Errorf("Credentials have different sizes: %d, %d\n", len(returned_creds), len(filtered_credentials))
+	}
 
-  for k, v := range returned_creds {
-    if filtered_credentials[k] != v{
-      t.Errorf("Credentials have different values for key %s: %s, %s", k, filtered_credentials[k], v)
-    }
-  }
+	for k, v := range returned_creds {
+		if filtered_credentials[k] != v {
+			t.Errorf("Credentials have different values for key %s: %s, %s", k, filtered_credentials[k], v)
+		}
+	}
 }

@@ -15,15 +15,15 @@
  */
 
 package IBMCloudEnv
+
 import (
-	"testing" 
-	"os"
 	"fmt"
 	"github.com/tidwall/gjson"
+	"os"
+	"testing"
 )
 
-const jsonObjectV1 = 
-`{
+const jsonObjectV1 = `{
 	"service1": [
 		{
 			"name": "service1-name1",
@@ -67,10 +67,10 @@ const jsonObjectV1 =
 			"name":"servicename3"
 		}
 	]
-}` 
+}`
 
 const vcap_applicationV1 = `{"application_name": "test-application"}`
-const var_stringV1 = `test-12345` 
+const var_stringV1 = `test-12345`
 const credentialsV1 = `{"credentials": {
 		"username": "env-var-json-username"
 	}}`
@@ -85,25 +85,24 @@ func setEnvVariableV1() {
 	Initialize("server/config/v1/mappings.json")
 }
 
-
 func TestPlainTextFileV1(t *testing.T) {
 	setEnvVariableV1()
 	testString, _ := GetString("file_var1")
 	if testString != "plain-text-string" {
-		t.Errorf("testString is: " +  testString)
+		t.Errorf("testString is: " + testString)
 		t.Errorf("can't read " + testString + " from GetString()")
-	} 
+	}
 
 	fmt.Println("IN V1 result var1 is: ")
 	fmt.Println(GetDictionary("file_var1"))
 
 	result := GetDictionary("file_var1").Get("value")
 	if result.String() != "plain-text-string" {
-		 t.Errorf("can't read " + result.String() + " text from GetDictionary()")
-	} 
+		t.Errorf("can't read " + result.String() + " text from GetDictionary()")
+	}
 }
 
-func TestJsonFileAndPathV1(t *testing.T){
+func TestJsonFileAndPathV1(t *testing.T) {
 	setEnvVariableV1()
 	testString, _ := GetString("file_var2")
 	if testString != gjson.Parse("{\"level2\":12345}").String() {
@@ -116,39 +115,39 @@ func TestJsonFileAndPathV1(t *testing.T){
 	}
 }
 
-func TestCFServiceCredentialsWithInstanceNameV1 (t *testing.T){
+func TestCFServiceCredentialsWithInstanceNameV1(t *testing.T) {
 	setEnvVariableV1()
-	
+
 	testString := GetDictionary("cf_var1").Get("username").String()
 	if testString != "service1-username1" {
 		t.Errorf("Got: \t%s\n Wanted: \t%s\n", testString, "{\"username\":\"service1-username1\"}")
 	}
 }
 
-func TestUserCredentialsWithVcapServicesV1(t *testing.T){
+func TestUserCredentialsWithVcapServicesV1(t *testing.T) {
 	setEnvVariableV1()
 	testString, _ := GetString("user_provided_var1")
-	if testString != "apikey1"{
+	if testString != "apikey1" {
 		t.Errorf("Got: \t%s\n Wanted: \t%s\n", testString, "apikey1")
 	}
 
 	testString2, _ := GetString("user_provided_var2")
-	if testString2 != "apikey2"{
+	if testString2 != "apikey2" {
 		t.Errorf("Got: \t%s\n Wanted: \t%s\n", testString2, "apikey2")
 	}
 
 	testString3, _ := GetString("user_provided_nested1")
-	if testString3 != "nestedValue1"{
+	if testString3 != "nestedValue1" {
 		t.Errorf("Got: \t%s\n Wanted: \t%s\n", testString3, "nestedValue1")
 	}
 
 	testString4, _ := GetString("user_provided_nested2")
-	if testString4 != "nestedValue3"{
+	if testString4 != "nestedValue3" {
 		t.Errorf("Got: \t%s\n Wanted: \t%s\n", testString4, "nestedValue3")
 	}
 }
 
-func TestReadVcapsWithJsonPathV1(t *testing.T){
+func TestReadVcapsWithJsonPathV1(t *testing.T) {
 	setEnvVariableV1()
 	testString, _ := GetString("cf_var2")
 
@@ -158,8 +157,8 @@ func TestReadVcapsWithJsonPathV1(t *testing.T){
 
 	result := GetDictionary("cf_var2").Get("value")
 	if result.String() != "service1-username1" {
-		 t.Errorf("can't read " + result.String() + " text from GetDictionary()")
-	} 
+		t.Errorf("can't read " + result.String() + " text from GetDictionary()")
+	}
 
 	testString2, _ := GetString("cf_var3")
 	if testString2 != "test-application" {
@@ -167,11 +166,11 @@ func TestReadVcapsWithJsonPathV1(t *testing.T){
 	}
 	result2 := GetDictionary("cf_var3").Get("value")
 	if result2.String() != "test-application" {
-		 t.Errorf("can't read " + result2.String() + " text from GetDictionary()")
-	} 
+		t.Errorf("can't read " + result2.String() + " text from GetDictionary()")
+	}
 }
 
-func TestSimpleStringFromEnvVarV1(t *testing.T){
+func TestSimpleStringFromEnvVarV1(t *testing.T) {
 	setEnvVariableV1()
 	testString, _ := GetString("env_var1")
 	if testString != "test-12345" {
@@ -179,11 +178,11 @@ func TestSimpleStringFromEnvVarV1(t *testing.T){
 	}
 	result := GetDictionary("env_var1").Get("value")
 	if result.String() != "test-12345" {
-		 t.Errorf("can't read " + result.String() + " text from GetDictionary()")
-	} 
+		t.Errorf("can't read " + result.String() + " text from GetDictionary()")
+	}
 }
 
-func TestJsonFromEnvVarV1(t *testing.T){
+func TestJsonFromEnvVarV1(t *testing.T) {
 	setEnvVariableV1()
 	testString, _ := GetString("env_var2")
 	if testString != credentials {
@@ -196,7 +195,7 @@ func TestJsonFromEnvVarV1(t *testing.T){
 	}
 }
 
-func TestJsonPathFromEnvVarV1(t *testing.T){
+func TestJsonPathFromEnvVarV1(t *testing.T) {
 	setEnvVariableV1()
 	testString, _ := GetString("env_var3")
 	if testString != "env-var-json-username" {
