@@ -1,8 +1,8 @@
 # IBM Cloud Environment
 
-The `ibm-cloud-env-golang` package allows to abstract environment variables from various Cloud compute providers, such as, but not limited to, CloudFoundry and Kubernetes, so the application could be environment-agnostic.
+The `ibm-cloud-env-golang` package allows for the abstraction of environment variables from various Cloud compute providers, such as, but not limited to, CloudFoundry and Kubernetes, so the application can be environment-agnostic.
 
-The package allows to define an array of search patterns that will be executed one by one until required value is found.
+The module allows for an array of search patterns that will be executed one by one until required value is found.
 
 ### Installation
 
