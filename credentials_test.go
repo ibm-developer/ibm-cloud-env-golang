@@ -21,13 +21,13 @@ import (
 )
 
 const service_credentials = `{
-  "tag_label_creds": "someOtherCreds",
-  "watson_discovery_password": "password",
-  "watson_conversation_password": "password",
-  "watson_conversation_url": "url",
-  "watson_conversation_username": "username",
-  "watson_conversation_api_key": "api_key",
-  "watson_conversation_apikey": "apikey"
+	"tag_label_creds": "someOtherCreds",
+	"watson_discovery_password": "password",
+	"watson_conversation_password": "password",
+	"watson_conversation_url": "url",
+	"watson_conversation_username": "username",
+	"watson_conversation_api_key": "api_key",
+	"watson_conversation_apikey": "apikey"
 }`
 
 var filtered_credentials map[string]string = map[string]string{
