@@ -34,19 +34,6 @@ const PREFIX_PATTERN_USER = "user-provided"
 
 var loadedMappings = make(map[string]interface{})
 
-func check(e error) {
-	if e != nil {
-		log.Error(e)
-	}
-}
-
-func strip_leading_slash(path string) string {
-	if (len(path) > 0) && (path[0] == '/' || path[0] == '\\') {
-		return path[1:]
-	}
-	return path
-}
-
 func Initialize(mappingsFilePath string) string {
 	json, err := ioutil.ReadFile(mappingsFilePath)
 	if err != nil {
@@ -125,16 +112,12 @@ func processSearchPattern(mappingName string, searchPattern string) (string, boo
 	switch patternComponents[0] {
 	case PREFIX_PATTERN_FILE:
 		value, OK = processFileSearchPattern(patternComponents)
-		break
 	case PREFIX_PATTERN_CF:
 		value, OK = processCFSearchPattern(patternComponents)
-		break
 	case PREFIX_PATTERN_ENV:
 		value, OK = processEnvSearchPattern(patternComponents)
-		break
 	case PREFIX_PATTERN_USER:
 		value, OK = processUserProvidedSearchPattern(patternComponents)
-		break
 	default:
 		log.Warnln("Unknown searchPattern prefix", patternComponents[0], "Supported prefixes: cloudfoundry, env, file")
 		return "", false
@@ -262,7 +245,10 @@ func deepSearch(current gjson.Result, search string) (string, bool) {
 
 func processJSONPath(jsonString string, jsonPath string) (string, bool) {
 	var json_data interface{}
-	json.Unmarshal([]byte(jsonString), &json_data)
+	err := json.Unmarshal([]byte(jsonString), &json_data)
+	if err != nil {
+		return "", false
+	} 
 	res, err := jsonpath.JsonPathLookup(json_data, jsonPath)
 	_, isMap := res.(map[string]interface{})
 	_, isArr := res.([]interface{})
