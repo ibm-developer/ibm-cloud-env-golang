@@ -29,7 +29,7 @@ ibm-cloud-config supports searching for values using four search pattern types -
 - Using `file` allows to search for values in text/json files
 
 #### Example search patterns
-- user-provided:service:name - searches through parsed VCAP_SERVICES environment variable and returns the value of the requested service name and credential
+- user-provided:service-instance-name:credential-key - searches through parsed VCAP_SERVICES environment variable and returns the value of the requested service name and credential
 - cloudfoundry:service-instance-name - searches through parsed VCAP_SERVICES environment variable and returns the `credentials` object of the matching service instance name
 - cloudfoundry:$.JSONPath - searches through parsed VCAP_SERVICES and VCAP_APPLICATION environment variables and returns the value that corresponds to JSONPath
 - env:env-var-name - returns environment variable named "env-var-name"
