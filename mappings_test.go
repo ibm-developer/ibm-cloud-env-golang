@@ -149,3 +149,14 @@ func TestJsonPathFromEnvVar(t *testing.T) {
 		t.Errorf("Got: \t%s\n Wanted: \t%s\n", testString, "env-var-json-username")
 	}
 }
+
+func TestBadVars(t *testing.T) {
+	setEnvVariable()
+
+	for i := 1; i <= 4; i++ {
+		badStr, ok := GetString("bad_var" + string(i))
+		if badStr != "" || ok {
+			t.Errorf("Did not correctly fail bad string\n")
+		}
+	}
+}

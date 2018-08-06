@@ -248,7 +248,7 @@ func processJSONPath(jsonString string, jsonPath string) (string, bool) {
 	err := json.Unmarshal([]byte(jsonString), &json_data)
 	if err != nil {
 		return "", false
-	} 
+	}
 	res, err := jsonpath.JsonPathLookup(json_data, jsonPath)
 	_, isMap := res.(map[string]interface{})
 	_, isArr := res.([]interface{})
@@ -282,12 +282,16 @@ func GetCredentialsForService(serviceTag, serviceLabel, credentials string) map[
 
 func GetString(name string) (string, bool) {
 	val, ok := loadedMappings[name]
+	if !ok {
+		return "", false
+	}
+
 	_, isStr := val.(string)
-	if ok && !isStr {
+	if !isStr {
 		bytes, _ := json.Marshal(val)
 		return string(bytes), true
 	}
-	return val.(string), ok
+	return val.(string), true
 }
 
 func GetDictionary(name string) gjson.Result {
