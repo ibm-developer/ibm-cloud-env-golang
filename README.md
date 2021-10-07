@@ -1,3 +1,7 @@
+# WARNING: This repository is no longer maintained :warning:
+
+> This repository will not be updated. The repository will be kept available in read-only mode.
+
 # IBM Cloud Environment
 
 The `ibm-cloud-env-golang` package allows for the abstraction of environment variables from various Cloud compute providers, such as, but not limited to, CloudFoundry and Kubernetes, so the application can be environment-agnostic.
